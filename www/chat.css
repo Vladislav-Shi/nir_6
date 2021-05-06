@@ -1,0 +1,132 @@
+::-webkit-scrollbar { /* chrome based */
+  width: 0px;  /* ширина scrollbar'a */
+  background: transparent;  /* опционально */
+}
+.fixed-chat
+{
+    display: inline-flex;
+    flex-direction: row;
+    position: fixed;
+    bottom: 0; right: 0;
+    border: 1px solid;
+    border-color: blue;
+    height: 50%;
+    width: 25%;
+    margin-right: 3px;
+    margin-bottom: 1;
+}
+.chat-list
+{
+  flex-direction: column;
+  width: 15%;
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox  прячет скроллбар*/
+  margin: 2px 2px 2px 2px;
+  padding-bottom: 10px;
+}
+.chat-area
+{
+    height: 75%;
+    width: auto;
+    border: 1px solid;
+    border-color: blue;
+    
+}
+.msg_container_base {
+    margin: 2px 2px 2px 2px;
+    background: #e5e5e5;
+    height: 99%;
+    overflow-y: scroll;
+    scrollbar-width: none; /* Firefox  прячет скроллбар*/
+}
+.mes_box
+{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+}
+.mess_text
+{
+  display: block;
+  max-width: 60%;
+}
+/*  */
+.mess_time
+{
+  float: left;
+  display: block;
+  width: 100%;
+  margin-top: -10px;
+  font-size: 11px;
+  margin-right: 3px;
+}
+.right .mess_time
+{
+  text-align: right;
+  margin-right: 3px;
+}
+.oponent_mes
+{
+    padding: 2px 10px 2px 10px;
+    border-radius: 25px;
+    background-color: #82ccdd;
+    margin-right: 3px;
+}
+.yuor_mes
+{
+    padding: 2px 10px 2px 10px;
+    border-radius: 25px;
+    background-color: #f0fcff;
+    margin-right: 3px;
+}
+.right
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+.send_button
+{
+    border-radius: 0 15px 15px 0 !important;
+	background-color: rgba(0,0,0,0.3) !important;
+			border:0 !important;
+			color: white !important;
+			cursor: pointer;
+}
+.card {
+    position: relative;
+    display: flex; /* [1] */
+    align-items: center; /* [2] */
+    background-color: #fff;
+    padding: 3px;
+    border-radius: 5px;
+    box-shadow: 0 2px 13px 0 rgba(0, 0, 0, 0.05);
+    flex-direction: row;
+  }
+  
+  .card h3 {
+    font-size: 15px;
+  }
+  
+  .card p {
+    font-size: 13px;
+    color: #65676b;
+  }
+  
+  .card-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  .border {
+    position: absolute;
+    width: 52px;
+    height: 52px;
+    border: 2px solid #000 !important;
+    border-radius: 50%;
+    opacity: 0.1;
+  }

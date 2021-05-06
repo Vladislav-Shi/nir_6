@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <title>chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="boostrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="chat.css">
+    <script src="socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" charset="utf-8"></script>
+    <script src="function.js" charset="utf-8"></script>
+    <script src="chat.js" charset="utf-8"></script>
+</head>
+
+<body>
+    <div class="fixed-chat">
+        <div class="chat-list">
+            <!-- <div class="border "></div>
+            <img class="card-image" src="inlude/cat_img.jpg" alt="" />
+            <div class="border "></div>
+            <img class="card-image" src="inlude/cat_img.jpg" alt=""/>
+            <div class="border "></div>
+            <img class="card-image" src="inlude/cat_img.jpg" alt="" />
+            <div class="border "></div>
+            <img class="card-image" src="inlude/cat_img.jpg" alt="" /> -->
+
+        </div>
+        <div>
+            <!-- Текущий выбранный чат-->
+            <div class="card">
+                <img class="card-image" src="include/cat_img.jpg" alt="" onClick="click_div()" />
+                <div class="border"></div>
+                <div>
+                    <h3>Заголовок чата</h3>
+                    <p class="">Какая то инфа типо онлайн</p>
+                </div>
+            </div>
+            <!-- Область сообщений-->
+            <div class="chat-area">
+                <div class=" msg_container_base" id="chat-area">
+                    <!-- <div class="mes_box">
+                        <img class="card-image" src="include/cat_img.jpg" alt="" />
+                        <div class="border "></div>
+                        <div class="mess_text">
+                            <p class="oponent_mes">Мое сообщение</p>
+                            <div class="mess_time">22:02</div>
+                        </div>
+                    </div>
+                    <div class="mes_box right">
+                        <div>
+                            <p class="yuor_mes">Мое сообщение</p>
+                            <div class="mess_time">22:02</div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="text-area">
+                <textarea name="mes_area" id="mes_area" cols="26" rows="1" placeholder="Введите сообщение"></textarea>
+                <button class="send_button" id="mes_btn">Отправить</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
