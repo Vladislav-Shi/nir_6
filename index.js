@@ -90,11 +90,24 @@ io.on('connection', function (socket) {
         console.log("Список онлайн:")
         console.log(userOnline)
     });
-    //запрос онлайна пользователя
-    socket.on("online_status", (userId, socketId)=>
-    {
+    //запрос онлайна пользователя персональный чат
+    socket.on("online_status", (userId, socketId) => {
+        // has возвращает true если элемент есть онлайн
         io.to(socketId).emit('online_request', userOnline.has(userId));
+    });
+    //запрос кол-ва человек в чате и онлайна чата
+    socket.on("online_status_group_chat", (chatId, socketId) => {
+        connection.query("SELECT user_id FROM user_chat WHERE chat_id=\"" + chatId + "\"",
+            (err, result) => {
+                if (err) {
+                    console.log(err);
+                }
+                // меньше нагрузить сервер и кинуть просто весь массив клиенту, а там пусть обрабатывает
+                // нужно перевести map в массив ибо сокет что то его не отправляет
+                io.to(socketId).emit('online_request_group_chat', result, Array.from(userOnline.keys()));
+            })
     })
+
     // запрос истории данного чата
     socket.on("history_chat", (chat_id, user_id) => {
         connection.query("SELECT message.*, user.name, user.user_img, chat.is_personal FROM message " +
