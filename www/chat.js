@@ -1,16 +1,105 @@
-var port = 3000; // Указываем порт на котором у на стоит сокет
-var socket = io.connect('http://localhost:' + port); // Тут мы объявляем "socket" (дальше мы будем с ним работать) и подключаемся сразу к серверу через порт
+let port = 3000; // Указываем порт на котором у на стоит сокет
+let socket = io.connect('http://localhost:' + port); // Тут мы объявляем "socket" (дальше мы будем с ним работать) и подключаемся сразу к серверу через порт
 let username = prompt("Введите свое имя");
 let userId = -1;
 let chatId = -1; // хранит текущий чат
 let resultSave; // будет хранить список чатов чтобы не делать запрос
+let sendFile; // переменная хранит загруженную картинку
 socket.emit("user", username);
 console.log(socket);
+
+// при загрузке документа вызывается это
+$(document).ready(function () {
+    // код для загрузки файлов
+    let dropZone = $('#drop_area'),
+        maxFileSize = 1000000; // максимальный размер файла - 1 мб.
+    if (typeof (window.FileReader) == 'undefined') {
+        dropZone.text('Не поддерживается браузером!');
+        dropZone.addClass('error');
+    }
+    dropZone[0].ondragover = function () {
+        dropZone.addClass('hover');
+        return false;
+    };
+    dropZone[0].ondragleave = function () {
+        dropZone.removeClass('hover');
+        return false;
+    };
+    dropZone.onClick
+    dropZone[0].ondrop = function (event) {
+        event.preventDefault();
+        dropZone.removeClass('hover');
+        dropZone.addClass('drop');
+        sendFile = event.dataTransfer.files[0];
+        if (sendFile.size > maxFileSize) {
+            dropZone.text('Файл слишком большой!');
+            dropZone.addClass('error');
+            return false;
+        }
+    };
+});
+
+$(document).on('click', '#drop_area', () => {
+    if ($('#drop_area').hasClass('error')) {
+        $('#drop_area').text("перетащить файл")
+        $('#drop_area').removeClass('error')
+    }
+    if ($('#drop_area').hasClass('drop')) {
+        $('#drop_area').removeClass('drop')
+    }
+    if ($('#drop_area').hasClass('hover')) {
+        $('#drop_area').removeClass('hover')
+    }
+
+})
+
 $(document).on('click', '#mes_btn', function () {
-    console.log($("#mes_area").val());
-    let mess = $("#mes_area").val();
-    socket.emit('send_mess', mess, chatId, userId);
-    $("textarea").val("");
+    if ($("#mes_area").val().trim() != "") {
+        console.log($("#mes_area").val());
+        let mess = $("#mes_area").val();
+        socket.emit('send_mess', mess, chatId, userId);
+        $("textarea").val("");
+
+        // для отправки картинки
+        if ($('#drop_area').hasClass('error')) {
+            $('#drop_area').text("перетащить файл")
+            $('#drop_area').removeClass('error')
+        }
+        if ($('#drop_area').hasClass('drop')) {
+            $('#drop_area').removeClass('drop')
+        }
+        if ($('#drop_area').hasClass('hover')) {
+            $('#drop_area').removeClass('hover')
+        }
+        if (typeof sendFile == 'undefined') {
+            sendFile = undefined; // очищаем содержимое переменной
+            return;
+        }
+        // создадим объект данных формы
+        var data = new FormData();
+        // заполняем объект данных файлами в подходящем для отправки формате
+        $.each(sendFile, function (key, value) {
+            data.append(key, value);
+        });
+        $.ajax({
+            url: '/',
+            method: 'POST',
+            headers: { "Content-Type": "multipart/form-data" },
+            data: data,
+            cache: false,
+            processData: false, // Не обрабатываем файлы (Don't process the files)
+            contentType: false, // Так jQuery скажет серверу что это строковой запрос
+            success: (respond, status, jqXHR) => {
+                console.log("Файл успешно отправлен!")
+                console.log(respond);
+            },
+            // функция ошибки ответа сервера
+            error: (jqXHR, status, errorThrown) => {
+                console.log('ОШИБКА AJAX запроса: ' + status, jqXHR);
+            }
+        })
+        sendFile = undefined; // очищаем содержимое переменной
+    }
 })
 // Функция обработки нажатия на иконку чата
 function click_div(id) {

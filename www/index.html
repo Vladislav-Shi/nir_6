@@ -24,18 +24,20 @@
             <img class="card-image" src="inlude/cat_img.jpg" alt="" />
             <div class="border "></div>
             <img class="card-image" src="inlude/cat_img.jpg" alt="" /> -->
-
         </div>
-        <div>
-            <!-- Текущий выбранный чат-->
-            <div class="card">
-                <img class="card-image" src="include/cat_img.jpg" alt="" onClick="click_div()" />
-                <div class="border"></div>
-                <div>
-                    <h3>Заголовок чата</h3>
-                    <p class="">Какая то инфа типо онлайн</p>
+        <div style="flex: max-content;">
+            <div>
+                <!-- Текущий выбранный чат-->
+                <div class="card">
+                    <img class="card-image" src="include/cat_img.jpg" alt="" onClick="click_div()" />
+                    <div class="border"></div>
+                    <div>
+                        <h3>Заголовок чата</h3>
+                        <p class="">Какая то инфа типо онлайн</p>
+                    </div>
                 </div>
             </div>
+
             <!-- Область сообщений-->
             <div class="chat-area">
                 <div class=" msg_container_base" id="chat-area">
@@ -56,8 +58,11 @@
                 </div>
             </div>
             <div class="text-area">
-                <textarea name="mes_area" id="mes_area" cols="26" rows="1" placeholder="Введите сообщение"></textarea>
-                <button class="send_button" id="mes_btn">Отправить</button>
+                <textarea name="mes_area" id="mes_area" cols="29" rows="2" placeholder="Введите сообщение"></textarea>
+                <div>
+                    <div id="drop_area">перетащить файл</div>
+                    <button class="send_button" id="mes_btn">Отправить</button>
+                </div>
             </div>
         </div>
     </div>

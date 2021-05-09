@@ -9,6 +9,7 @@ server.listen(port);
 app.use(express.static(__dirname + '/www')); // Отправляет "статические" файлы из папки public при коннекте // __dirname - путь по которому лежит index.js
 // подключение к bd
 const mysql = require("mysql2");
+const multer = require("multer");
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -134,4 +135,14 @@ io.on('connection', function (socket) {
         console.log("Получено сообщение в " + date);
         io.sockets.emit('messageToClients', message, chat_id, user_id); // Отправляем всем сокетам событие 'messageToClients' и отправляем туда же два аргумента (текст, имя юзера)
     });
+});
+// обработка файлов
+app.post("/", function (req, res, next) {
+    console.log("Обработка присланного файла");
+    let filedata = req.file;
+    console.log(filedata);
+    if (!filedata)
+        res.send("Ошибка при загрузке файла");
+    else
+        res.send("Файл загружен");
 });

@@ -7,7 +7,7 @@
     display: inline-flex;
     flex-direction: row;
     position: fixed;
-    bottom: 0; right: 0;
+    bottom: 1px; right: 0;
     border: 1px solid;
     border-color: blue;
     height: 50%;
@@ -26,8 +26,9 @@
 }
 .chat-area
 {
-    height: 75%;
-    width: auto;
+    position: absolute; /* */
+    height: 70%;
+    width: 84%;
     border: 1px solid;
     border-color: blue;
     
@@ -51,7 +52,7 @@
 .mess_text
 {
   display: block;
-  max-width: 60%;
+  max-width: 65%;
 }
 /*  */
 .mess_time
@@ -88,18 +89,52 @@
     flex-direction: row;
     justify-content: flex-end;
 }
+
+.text-area
+{
+  position: absolute;
+  bottom: 0%;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: row;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+#drop_area
+{
+  padding-top: -2px;
+    color: #555;
+    text-align: center;
+    border-radius: 15px !important;
+    border: 1px solid  rgba(0,0,0,0.3) !important;
+}
+#drop_area.hover {
+  background: #ddd;
+  border-color: #aaa;
+}
+
+#drop_area.error {
+  background: #faa;
+  border-color: #f00;
+}
+#drop_area.drop {
+  background: #afa;
+  border-color: #0f0;
+}
 .send_button
 {
-    border-radius: 0 15px 15px 0 !important;
-	background-color: rgba(0,0,0,0.3) !important;
-			border:0 !important;
-			color: white !important;
-			cursor: pointer;
+    margin-left: 3px;
+    margin-top: 2px;
+    border-radius: 15px !important;
+  	background-color: rgba(0,0,0,0.3) !important;
+    border:0 !important;
+    color: white !important;
+    cursor: pointer;
 }
 .card {
-    position: relative;
-    display: flex; /* [1] */
-    align-items: center; /* [2] */
+    min-width: 100%;
+    align-items: center;
     background-color: #fff;
     padding: 3px;
     border-radius: 5px;
