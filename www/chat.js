@@ -1,104 +1,65 @@
 let port = 3000; // Указываем порт на котором у на стоит сокет
 let socket = io.connect('http://localhost:' + port); // Тут мы объявляем "socket" (дальше мы будем с ним работать) и подключаемся сразу к серверу через порт
+var uploader = new SocketIOFileClient(socket); // для отправки файлов
 let username = prompt("Введите свое имя");
 let userId = -1;
 let chatId = -1; // хранит текущий чат
 let resultSave; // будет хранить список чатов чтобы не делать запрос
-let sendFile; // переменная хранит загруженную картинку
 socket.emit("user", username);
 console.log(socket);
 
-// при загрузке документа вызывается это
-$(document).ready(function () {
-    // код для загрузки файлов
-    let dropZone = $('#drop_area'),
-        maxFileSize = 1000000; // максимальный размер файла - 1 мб.
-    if (typeof (window.FileReader) == 'undefined') {
-        dropZone.text('Не поддерживается браузером!');
-        dropZone.addClass('error');
-    }
-    dropZone[0].ondragover = function () {
-        dropZone.addClass('hover');
-        return false;
-    };
-    dropZone[0].ondragleave = function () {
-        dropZone.removeClass('hover');
-        return false;
-    };
-    dropZone.onClick
-    dropZone[0].ondrop = function (event) {
-        event.preventDefault();
-        dropZone.removeClass('hover');
-        dropZone.addClass('drop');
-        sendFile = event.dataTransfer.files[0];
-        if (sendFile.size > maxFileSize) {
-            dropZone.text('Файл слишком большой!');
-            dropZone.addClass('error');
-            return false;
-        }
-    };
+// логирование событий загрузки файла
+uploader.on('start', function (fileInfo) {
+    console.log('Start uploading', fileInfo);
+});
+uploader.on('stream', function (fileInfo) {
+    console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
+});
+uploader.on('complete', function (fileInfo) {
+    console.log('Upload Complete', fileInfo);
+});
+uploader.on('error', function (err) {
+    console.log('Error!', err);
+});
+uploader.on('abort', function (fileInfo) {
+    console.log('Aborted: ', fileInfo);
 });
 
-$(document).on('click', '#drop_area', () => {
-    if ($('#drop_area').hasClass('error')) {
-        $('#drop_area').text("перетащить файл")
-        $('#drop_area').removeClass('error')
-    }
-    if ($('#drop_area').hasClass('drop')) {
-        $('#drop_area').removeClass('drop')
-    }
-    if ($('#drop_area').hasClass('hover')) {
-        $('#drop_area').removeClass('hover')
-    }
-
-})
+// при загрузке документа вызывается это
+$(document).ready(function () {
+    $("#input__file").change(function () {
+        var filename = $(this).val().replace(/.*\\/, "");
+        $("#progressbar").html(filename);
+    });
+});
 
 $(document).on('click', '#mes_btn', function () {
-    if ($("#mes_area").val().trim() != "") {
-        console.log($("#mes_area").val());
-        let mess = $("#mes_area").val();
-        socket.emit('send_mess', mess, chatId, userId);
-        $("textarea").val("");
+    let fileName = null;
+    let uploadDir = null;
+    let mess = $("#mes_area").val();
+    var fileEl = document.getElementById('input__file')
+    if (fileEl.value) {
+        let typeFile = fileEl.value.split('.'); // последний элемент массива будет содержать расшмрение
+        fileName = "" + chatId + "_" + userId + "_" + new Date().toISOString().slice(0, 19).replace('T', '_')
+            + "." + typeFile[typeFile.length - 1];
+        console.log('fileEl:', fileEl)
+        if (typeFile[typeFile.length - 1].includes('png') || typeFile[typeFile.length - 1].includes('jpg')) {
+            uploadDir = "image";
+        }
+        else {
+            uploadDir = "other";
+        }
 
-        // для отправки картинки
-        if ($('#drop_area').hasClass('error')) {
-            $('#drop_area').text("перетащить файл")
-            $('#drop_area').removeClass('error')
-        }
-        if ($('#drop_area').hasClass('drop')) {
-            $('#drop_area').removeClass('drop')
-        }
-        if ($('#drop_area').hasClass('hover')) {
-            $('#drop_area').removeClass('hover')
-        }
-        if (typeof sendFile == 'undefined') {
-            sendFile = undefined; // очищаем содержимое переменной
-            return;
-        }
-        // создадим объект данных формы
-        var data = new FormData();
-        // заполняем объект данных файлами в подходящем для отправки формате
-        $.each(sendFile, function (key, value) {
-            data.append(key, value);
+        var uploadIds = uploader.upload(fileEl, {
+            uploadTo: uploadDir,
+            data: { name: fileName }
         });
-        $.ajax({
-            url: '/',
-            method: 'POST',
-            headers: { "Content-Type": "multipart/form-data" },
-            data: data,
-            cache: false,
-            processData: false, // Не обрабатываем файлы (Don't process the files)
-            contentType: false, // Так jQuery скажет серверу что это строковой запрос
-            success: (respond, status, jqXHR) => {
-                console.log("Файл успешно отправлен!")
-                console.log(respond);
-            },
-            // функция ошибки ответа сервера
-            error: (jqXHR, status, errorThrown) => {
-                console.log('ОШИБКА AJAX запроса: ' + status, jqXHR);
-            }
-        })
-        sendFile = undefined; // очищаем содержимое переменной
+    }
+    if ($("#mes_area").val().trim() != "" || fileEl.value) {
+        socket.emit('send_mess', mess, chatId, userId, fileName, uploadDir);
+        $("textarea").val("");
+        document.getElementById("input__file").value = null;
+        $("#progressbar").html('');
     }
 })
 // Функция обработки нажатия на иконку чата
@@ -203,9 +164,8 @@ socket.on("chat_list", (result, userId2) => {
     }
 })
 
-socket.on("messageToClients", function (mess, chatIdArg, id) {
+socket.on("messageToClients", function (mess, chatIdArg, id, path_file) {
     if (chatIdArg == chatId) {
-        console.log("Сообщение добавлено: " + mess);
         let date = new Date().toISOString().slice(0, 19).replace('T', ' ');
         let isPersonal;
         let pathImg;
@@ -218,12 +178,10 @@ socket.on("messageToClients", function (mess, chatIdArg, id) {
             }
         })
         if (isPersonal == 0) {
-
-            iconMessage(mess, date.substr(11, 5), pathImg, id == userId)
-
+            iconMessage(mess, date.substr(11, 5), pathImg, id == userId, path_file)
         }
         else {
-            basicMessage(mess, date.substr(11, 5), id == userId); // рисует сообщения для просто чата 
+            basicMessage(mess, date.substr(11, 5), id == userId, path_file); // рисует сообщения для просто чата 
         }
 
     }
@@ -234,12 +192,11 @@ socket.on("history_mess", (result, id) => {
         $("#chat-area").empty(); // очищает тэг
         result.forEach(element => {
             let dates = element['send_time'].substr(11, 5);
-            console.log(dates);
             if (result[0]["is_personal"] == 0) {
-                iconMessage(element['text'], dates, element["user_img"], element["user_id"] == userId,)
+                iconMessage(element['text'], dates, element["user_img"], element["user_id"] == userId, element["path_file"])
             }
             else {
-                basicMessage(element['text'], dates, element["user_id"] == userId);
+                basicMessage(element['text'], dates, element["user_id"] == userId, element["path_file"]);
             }
 
         });

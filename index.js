@@ -7,9 +7,8 @@ var userOnline = new Map(); // ассоциативный массив поль�
 console.log("Script Start! \n" + __dirname + '/www');
 server.listen(port);
 app.use(express.static(__dirname + '/www')); // Отправляет "статические" файлы из папки public при коннекте // __dirname - путь по которому лежит index.js
-// подключение к bd
 const mysql = require("mysql2");
-const multer = require("multer");
+const SocketIOFile = require('socket.io-file');
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -29,14 +28,42 @@ connection.connect(function (err) {
 
 // обработка событий 
 io.on('connection', function (socket) {
+    var uploader = new SocketIOFile(socket, {
+        uploadDir: {			// multiple directories
+            image: 'www/include/image', // сюда картинки все
+            other: 'www/include/other' // все остальное сюда
+        },
+        maxFileSize: 4194304, 						// 4 MB. default is undefined(no limit)
+        chunkSize: 10240,							// default is 10240(1KB)
+        transmissionDelay: 0,						// delay of each transmission, higher value saves more cpu resources, lower upload speed. default is 0(no delay)
+        overwrite: true, 							// overwrite file if exists, default is true.
+        rename: function (filename, fileInfo) {
+            return fileInfo.data.name
+        }
+    });
+    // console.log('uploader:', uploader);
+    // логирование событий загрузки файла
+    uploader.on('start', (fileInfo) => {
+        console.log('Start uploading');
+        console.log(fileInfo);
+    });
+    uploader.on('stream', (fileInfo) => {
+        console.log(`${fileInfo.wrote} / ${fileInfo.size} byte(s)`);
+    });
+    uploader.on('complete', (fileInfo) => {
+        console.log('Upload Complete.');
+        console.log(fileInfo);
+    });
+    uploader.on('error', (err) => {
+        console.log('Error!', err);
+    });
+    uploader.on('abort', (fileInfo) => {
+        console.log('Aborted: ', fileInfo);
+    });
+
+
     console.log(socket["id"]);// id сокета
     console.log('A user connected');
-    // let lastSocketId; // последний id сокета для записи онлайна
-    // for (let entry of io.sockets.sockets) {
-    //     console.log("element")
-    //     console.log(entry[0]);
-    //     lastSocketId = entry[0];
-    // }
     console.log("Кол-во пользователей: " + io.sockets.sockets.size);
     socket.on("user", (username) => // событие подключения пользователя
     {
@@ -73,8 +100,6 @@ io.on('connection', function (socket) {
                     console.log(err);
                 }
                 if (result != 0) {
-                    // console.log("\nСписок чатов\n");
-                    // console.log(result);
                     io.sockets.emit("chat_list", result, userId);
                 }
                 else {
@@ -123,26 +148,20 @@ io.on('connection', function (socket) {
             });
     });
 
-    socket.on("send_mess", function (message, chat_id, user_id) {
+    socket.on("send_mess", function (message, chat_id, user_id, file, uploadDir) {
         var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        connection.query("INSERT INTO message (id, chat_id, user_id, text, send_time) VALUES (NULL, " + chat_id + ", " + user_id + ", '" + message + "', '" + date + "')",
+        // console.log("INSERT INTO message (id, chat_id, user_id, text, send_time, path_file) VALUES" +
+        //     "(NULL, " + chat_id + ", " + user_id + ", '" + message + "', '" + date + "', " + uploadDir + "/" + file + ")");
+        connection.query("INSERT INTO message (id, chat_id, user_id, text, send_time, path_file) VALUES" +
+            "(NULL, " + chat_id + ", " + user_id + ", '" + message + "', '" + date + "', '" + uploadDir + "/" + file + "')",
             (err, result) => {
                 if (err) {
                     console.log("Ошибка внесения в таблицу");
                     console.log(err);
                 }
             })
+        io.sockets.emit('messageToClients', message, chat_id, user_id, uploadDir + "/" + file); // Отправляем всем сокетам событие 'messageToClients' и отправляем туда же два аргумента (текст, имя юзера)
         console.log("Получено сообщение в " + date);
-        io.sockets.emit('messageToClients', message, chat_id, user_id); // Отправляем всем сокетам событие 'messageToClients' и отправляем туда же два аргумента (текст, имя юзера)
+
     });
-});
-// обработка файлов
-app.post("/", function (req, res, next) {
-    console.log("Обработка присланного файла");
-    let filedata = req.file;
-    console.log(filedata);
-    if (!filedata)
-        res.send("Ошибка при загрузке файла");
-    else
-        res.send("Файл загружен");
 });

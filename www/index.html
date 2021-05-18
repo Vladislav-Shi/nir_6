@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="boostrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="chat.css">
     <script src="socket.io.js"></script>
+    <script src="socket.io-file-client.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.0.min.js" charset="utf-8"></script>
     <script src="function.js" charset="utf-8"></script>
     <script src="chat.js" charset="utf-8"></script>
@@ -44,23 +45,27 @@
                     <!-- <div class="mes_box">
                         <img class="card-image" src="include/cat_img.jpg" alt="" />
                         <div class="border "></div>
-                        <div class="mess_text">
-                            <p class="oponent_mes">Мое сообщение</p>
+                        <div class="oponent_mes">
+                            <p>Мое сообщение</p>
+                            <img class="mess_img" src="include/image/enotic.png">
                             <div class="mess_time">22:02</div>
                         </div>
                     </div>
                     <div class="mes_box right">
-                        <div>
-                            <p class="yuor_mes">Мое сообщение</p>
+                        <div class="yuor_mes">
+                            <p>Мое сообщение</p>
+                            <img class="mess_img" src="include/image/enotic.png">
                             <div class="mess_time">22:02</div>
                         </div>
                     </div> -->
                 </div>
             </div>
+            <div class="progressbar" id="progressbar"></div>
             <div class="text-area">
-                <textarea name="mes_area" id="mes_area" cols="29" rows="2" placeholder="Введите сообщение"></textarea>
-                <div>
-                    <div id="drop_area">перетащить файл</div>
+                <textarea name="mes_area" id="mes_area" cols="33" rows="2" placeholder="Введите сообщение"></textarea>
+                <div>  
+                    <label for="input__file" class="file_btn">Файл</label>
+                    <input class="" type="file" name="file" id="input__file">
                     <button class="send_button" id="mes_btn">Отправить</button>
                 </div>
             </div>
