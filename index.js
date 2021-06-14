@@ -1,9 +1,9 @@
-var express = require('express'); // Подключаем express
-var app = express();
-var server = require('http').Server(app);
-var port = 3000;
-var io = require('socket.io')(server);
-var userOnline = new Map(); // ассоциативный массив пользователей стостоящий из id_user : id_socket
+const express = require('express'); // Подключаем express
+const app = express();
+const server = require('http').Server(app);
+let port = 3000;
+const io = require('socket.io')(server);
+let userOnline = new Map(); // ассоциативный массив пользователей стостоящий из id_user : id_socket
 console.log("Script Start! \n" + __dirname + '/www');
 server.listen(port);
 app.use(express.static(__dirname + '/www')); // Отправляет "статические" файлы из папки public при коннекте // __dirname - путь по которому лежит index.js
@@ -41,15 +41,16 @@ io.on('connection', function (socket) {
             return fileInfo.data.name
         }
     });
-    // console.log('uploader:', uploader);
     // логирование событий загрузки файла
     uploader.on('start', (fileInfo) => {
         console.log('Start uploading');
         console.log(fileInfo);
+
     });
     uploader.on('stream', (fileInfo) => {
         console.log(`${fileInfo.wrote} / ${fileInfo.size} byte(s)`);
     });
+    // если загрузился только тогда вызывать метод с картинками
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
         console.log(fileInfo);
@@ -143,15 +144,24 @@ io.on('connection', function (socket) {
                 if (err) {
                     console.log(err);
                 }
-                io.sockets.emit("history_mess", results, user_id); // отправляем историю чата
+                io.sockets.emit("history_mess", results, user_id, chat_id); // отправляем историю чата
                 // возвращаем еще  result[0][id] для избежания повторной загрузки истории сообщений
             });
     });
+    // помечает сообщения для пользователя прочитанными
+    socket.on("read_messages", (chat_id, user_id) => {
+        connection.query("CALL read_message(" + user_id + ", " + chat_id + ")",
+            (err, result) => {
+                if (err) {
+                    console.log("Ошибка процедуры");
+                    console.log(err);
+                }
+            });
+        console.log("CALL read_message(" + user_id + ", " + chat_id + ")")
+    })
 
     socket.on("send_mess", function (message, chat_id, user_id, file, uploadDir) {
         var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        // console.log("INSERT INTO message (id, chat_id, user_id, text, send_time, path_file) VALUES" +
-        //     "(NULL, " + chat_id + ", " + user_id + ", '" + message + "', '" + date + "', " + uploadDir + "/" + file + ")");
         connection.query("INSERT INTO message (id, chat_id, user_id, text, send_time, path_file) VALUES" +
             "(NULL, " + chat_id + ", " + user_id + ", '" + message + "', '" + date + "', '" + uploadDir + "/" + file + "')",
             (err, result) => {
@@ -159,9 +169,19 @@ io.on('connection', function (socket) {
                     console.log("Ошибка внесения в таблицу");
                     console.log(err);
                 }
+                else {
+                    // Отправлять события только при положительном исходе
+                    io.sockets.emit('messageToClients', message, chat_id, user_id, uploadDir + "/" + file); // Отправляем всем сокетам событие 'messageToClients' и отправляем туда же два аргумента (текст, имя юзера)
+                    console.log("Получено сообщение в " + date);
+                }
             })
-        io.sockets.emit('messageToClients', message, chat_id, user_id, uploadDir + "/" + file); // Отправляем всем сокетам событие 'messageToClients' и отправляем туда же два аргумента (текст, имя юзера)
-        console.log("Получено сообщение в " + date);
-
+        // процедура добавляет в таблицу запись о новом непрочитанном сообщении в чате
+        connection.query("CALL new_message(" + user_id + ", " + chat_id + ")",
+            (err, result) => {
+                if (err) {
+                    console.log("Ошибка процедуры");
+                    console.log(err);
+                }
+            });
     });
 });
