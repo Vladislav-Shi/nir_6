@@ -10,67 +10,14 @@
     <script src="socket.io.js"></script>
     <script src="socket.io-file-client.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.0.min.js" charset="utf-8"></script>
-    <script src="function.js" charset="utf-8"></script>
     <script src="chat.js" charset="utf-8"></script>
 </head>
 
 <body>
-    <div class="fixed-chat">
-        <div class="chat-list">
-            <!-- <div class="border "></div>
-            <img class="card-image" src="inlude/cat_img.jpg" alt="" />
-            <div class="border "></div>
-            <img class="card-image" src="inlude/cat_img.jpg" alt=""/>
-            <div class="border "></div>
-            <img class="card-image" src="inlude/cat_img.jpg" alt="" />
-            <div class="border "></div>
-            <img class="card-image" src="inlude/cat_img.jpg" alt="" /> -->
-        </div>
-        <div style="flex: max-content;">
-            <div>
-                <!-- Текущий выбранный чат-->
-                <div class="card">
-                    <img class="card-image" src="include/cat_img.jpg" alt="" onClick="click_div()" />
-                    <div class="border"></div>
-                    <div>
-                        <h3>Заголовок чата</h3>
-                        <p class="">Какая то инфа типо онлайн</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Область сообщений-->
-            <div class="chat-area">
-                <div class=" msg_container_base" id="chat-area">
-                    <!-- <div class="mes_box">
-                        <img class="card-image" src="include/cat_img.jpg" alt="" />
-                        <div class="border "></div>
-                        <div class="oponent_mes">
-                            <p>Мое сообщение</p>
-                            <img class="mess_img" src="include/image/enotic.png">
-                            <div class="mess_time">22:02</div>
-                        </div>
-                    </div>
-                    <div class="mes_box right">
-                        <div class="yuor_mes">
-                            <p>Мое сообщение</p>
-                            <img class="mess_img" src="include/image/enotic.png">
-                            <div class="mess_time">22:02</div>
-                        </div>
-                    </div> -->
-                </div>
-            </div>
-            <div class="progressbar" id="progressbar"></div>
-            <div class="text-area">
-                <textarea name="mes_area" id="mes_area" cols="33" rows="2" placeholder="Введите сообщение"></textarea>
-                <div>  
-                    <label for="input__file" class="file_btn">Файл</label>
-                    <input class="" type="file" name="file" id="input__file">
-                    <button class="send_button" id="mes_btn">Отправить</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script>
+        let user = prompt("Введите свое имя");
+        chatConfig(user, 3000); // вызов функции генерации чата.
+    </script>
 </body>
 
 </html>
