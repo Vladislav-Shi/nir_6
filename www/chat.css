@@ -24,6 +24,11 @@
   margin: 2px 2px 2px 2px;
   padding-bottom: 10px;
 }
+.chat-list .card-image
+{
+  margin-bottom: 10px;
+}
+
 .chat-area
 {
     position: absolute; /* */
@@ -173,7 +178,36 @@
     position: absolute;
     width: 52px;
     height: 52px;
-    border: 2px solid #000 !important;
+    border: 2px solid rgba(0, 0, 0, 0.2) !important;
     border-radius: 50%;
-    opacity: 0.1;
   }
+  /* Для значка кол-ва сообщений */
+  .message_status
+  {
+    max-width: 18px;
+    position: absolute;
+    background: rgba(92, 63, 255, 1);
+    border: 1px solid rgba(92, 63, 255, 1) !important;
+    border-radius: 50%;
+    font-size: 11px;
+    color: rgb(255, 255, 255);
+    padding-right: 3px;
+    z-index: 300;
+  }
+ [data-tooltip]::after {
+  content: attr(data-tooltip); /* Выводим текст */
+  position: absolute; /* Абсолютное позиционирование */
+  width: 120px; /* Ширина подсказки */
+  left: 0; top: 0; /* Положение подсказки */
+  background: #0083ee; /* Синий цвет фона */
+  color: #fff; /* Цвет текста */
+  padding: 0.5em; /* Поля вокруг текста */
+  z-index: 200;
+  pointer-events: none; /* Подсказка */
+  opacity: 0; /* Подсказка невидима */
+  transition: 1s; /* Время появления подсказки */
+ } 
+ [data-tooltip]:hover::after {
+  opacity: 1; /* Показываем подсказку */
+  top: 2em; /* Положение подсказки */
+ }
