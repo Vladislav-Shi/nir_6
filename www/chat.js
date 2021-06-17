@@ -10,6 +10,7 @@ let resultSave; // будет хранить список чатов чтобы 
 // настрйока чата
 function chatConfig(newUsername, newPort) {
     createHtml();
+    username = newUsername;
     port = newPort; // Указываем порт на котором у на стоит сокет
     socket = io.connect('http://localhost:' + port, { // доп. загаловки для разрешения получения инфы от сторонних сероверов.
         extraHeaders: {
@@ -186,7 +187,7 @@ function chatConfig(newUsername, newPort) {
     });
 
     socket.on("user_error", () => {
-        if (user_id == -1) {
+        if (userId == -1) {
             console.log("Неверный ник");
             $("#chat-area").append('<h4>Требуется авторизация!</h4>');
         }

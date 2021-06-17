@@ -1,8 +1,9 @@
 const express = require('express'); // Подключаем express
+var cors = require('cors');
 const app = express();
 const server = require('http').Server(app);
 let port = 3000;
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, { cors: { origin: '*', } });
 let userOnline = new Map(); // ассоциативный массив пользователей стостоящий из id_user : id_socket
 console.log("Script Start! \n" + __dirname + '/www');
 server.listen(port);
